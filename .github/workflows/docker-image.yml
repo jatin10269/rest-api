@@ -1,3 +1,7 @@
+secrets:     
+      JFROG_USER_WRITER: "jatin10269@gmail.com",
+      JFROG_PASSWORD_WRITER": "eyJ2ZXIiOiIyIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYiLCJraWQiOiJoVjB3WndxZGJkeVRpanNVNlpkVTBwOEpJX0JfaE8zZUJQUm1NdnZFUHhjIn0.eyJzdWIiOiJqZmZlQDAwMFwvdXNlcnNcL2phdGluMTAyNjlAZ21haWwuY29tIiwic2NwIjoic3lzdGVtOmlkZW50aXRpZXM6cix3LGQiLCJhdWQiOiJqZmFjQCoiLCJpc3MiOiJqZmZlQDAwMCIsImlhdCI6MTY3MjE3MDQ3NSwianRpIjoiYTA1MmYzYzUtODJlOS00ZTgwLWI4ZjUtZDZiMWY4MDUyY2Q3In0.H-Qm3wR6-Q3qOb5KF_WGi9KpmH0I_Z8qIHGAqt3V2JGLzBVUHthbUVYwZT3k2Ji25qXcIYxL3ZdjvXfR8G0GeaYBsQ09p4ppvg_V4A6hRxcG4zjF1LwKFliuDWBnWQTPTHBZDf-3Qo3lbjLi-kr8n69ibYu8oByBggAvo_4dJhTSZ8sLjUXOovK-fVKsPtx2K8K1y40ZPJBR-D4DYJWEMFRR5aPuDv_tI9yRKwYUZwzXzp6fBU50LGoRa6STJMZJJvymCnLOoRpAlmxpIpk3cq56RFDR4EVrTl8NWSEivfHhJLyX1-pkPGGsDZHDcUB2U9Ha5emjWB35CpnEdOVe8g",
+      
 name: Docker Image CI
 
 on:
@@ -11,8 +15,27 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
+      -
+        name: Set up QEMU 🏗️
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Set up Docker Buildx 🐋
+        uses: docker/setup-buildx-action@v1
+      -
+        name: Login to JFrog 🐸  
+        uses: docker/login-action@v1
+        with:
+          registry: jkapp.jfrog.io
+          username: ${{ secrets.JFROG_USER_WRITER }}
+          password: ${{ secrets.JFROG_PASSWORD_WRITER }}
+      -
+        name: Build and push 🐳
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: jkapp.jfrog.io/helloworld:1.0
+          
