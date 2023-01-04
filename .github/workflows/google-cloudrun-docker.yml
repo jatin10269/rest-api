@@ -93,13 +93,20 @@ jobs:
       # BEGIN - Docker auth and build (NOTE: If you already have a container image, these Docker steps can be omitted)
 
       # Authenticate Docker to Google Cloud Artifact Registry
-      - name: Docker Auth
-        id: docker-auth
-        uses: 'docker/login-action@v1'
+       - name: Login to GAR
+        uses: docker/login-action@v2
         with:
-          username: 'oauth2accesstoken'
-          password: 'b2F1dGgyYWNjZXNzdG9rZW46eWEyOS5hMEFYOUdCZFg0Rkt6THZNcmNOd0RnY1Nia2dIemwwaTJiaHU0Q0w3Tk0xcDdMdUdURVFzN0hObGlWcmsyV2RhY21CVGYyRzBPeWRsZlY3T2U4R0FnOXplbFp2emx6MGJ4NkstbExVa0dZN2NVYVNCLXB0Z2NZcHA1eWx5ZE5yWmNHRkZJd2pKc1pDZ3p5aUJjR0o4WlUwc1czX2tqbnR3OFZYekJ3Wm5aUkZDN0ZnZU1pTDVyY0hiM0lYUi1aakRvM2dDd3VKT1pJc0VTXzBrZElrT25YRW1wSUxRbFRkUmtPaUhULUdONGFDZ1lLQVNFU0FSRVNGUUhVQ3NiQ1RTeE5GZzlWaHd4Wm9ySHFlaVUtTncwMjM4'
-          registry: '${{ env.GAR_LOCATION }}'
+          registry: us-east5-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+      
+      #- name: Docker Auth
+       # id: docker-auth
+        #uses: 'docker/login-action@v1'
+        #with:
+         # username: 'oauth2accesstoken'
+         # password: 'b2F1dGgyYWNjZXNzdG9rZW46eWEyOS5hMEFYOUdCZFg0Rkt6THZNcmNOd0RnY1Nia2dIemwwaTJiaHU0Q0w3Tk0xcDdMdUdURVFzN0hObGlWcmsyV2RhY21CVGYyRzBPeWRsZlY3T2U4R0FnOXplbFp2emx6MGJ4NkstbExVa0dZN2NVYVNCLXB0Z2NZcHA1eWx5ZE5yWmNHRkZJd2pKc1pDZ3p5aUJjR0o4WlUwc1czX2tqbnR3OFZYekJ3Wm5aUkZDN0ZnZU1pTDVyY0hiM0lYUi1aakRvM2dDd3VKT1pJc0VTXzBrZElrT25YRW1wSUxRbFRkUmtPaUhULUdONGFDZ1lLQVNFU0FSRVNGUUhVQ3NiQ1RTeE5GZzlWaHd4Wm9ySHFlaVUtTncwMjM4'
+          #registry: '${{ env.GAR_LOCATION }}'
 #us-east5-docker.pkg.dev/testproject-373020/jkapprepo
       - name: Build and Push Container
         run: |-
