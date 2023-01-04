@@ -52,7 +52,7 @@ env:
   PROJECT_ID: testproject-373020 # TODO: update Google Cloud project id
   GAR_LOCATION: us-east5 # TODO: update Artifact Registry location
   SERVICE: jkapprepo # TODO: update Cloud Run service name
-  REGION: us-east1 # TODO: update Cloud Run service region
+  REGION: us-east5 # TODO: update Cloud Run service region
 
 jobs:
   deploy:
