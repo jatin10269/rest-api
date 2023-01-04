@@ -76,13 +76,6 @@ jobs:
           workload_identity_provider: 'projects/1081210593349/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
           service_account: 'jkaccount@testproject-373020.iam.gserviceaccount.com'
 
-      #- name: Google Auth
-       # id: auth
-        #uses: 'google-github-actions/auth@v0'
-        #with:
-         ##workload_identity_provider: '${{ secrets.WIF_PROVIDER }}' # e.g.-projects/1081210593349/locations/global/workloadIdentityPools/my-pool - projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider
-          #service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}' # e.g. - my-service-account@my-project.iam.gserviceaccount.com
-
       # NOTE: Alternative option - authentication via credentials json
       # - name: Google Auth
       #   id: auth
@@ -108,27 +101,27 @@ jobs:
          # password: 'b2F1dGgyYWNjZXNzdG9rZW46eWEyOS5hMEFYOUdCZFg0Rkt6THZNcmNOd0RnY1Nia2dIemwwaTJiaHU0Q0w3Tk0xcDdMdUdURVFzN0hObGlWcmsyV2RhY21CVGYyRzBPeWRsZlY3T2U4R0FnOXplbFp2emx6MGJ4NkstbExVa0dZN2NVYVNCLXB0Z2NZcHA1eWx5ZE5yWmNHRkZJd2pKc1pDZ3p5aUJjR0o4WlUwc1czX2tqbnR3OFZYekJ3Wm5aUkZDN0ZnZU1pTDVyY0hiM0lYUi1aakRvM2dDd3VKT1pJc0VTXzBrZElrT25YRW1wSUxRbFRkUmtPaUhULUdONGFDZ1lLQVNFU0FSRVNGUUhVQ3NiQ1RTeE5GZzlWaHd4Wm9ySHFlaVUtTncwMjM4'
           #registry: '${{ env.GAR_LOCATION }}'
 #us-east5-docker.pkg.dev/testproject-373020/jkapprepo
-      - name: Build and Push Container
-        run: |-
-          docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/website:${{ github.sha }}" ./
-          docker push "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/website:${{ github.sha }}"          
-      #- name: Build and push 🐳
-       # id: docker_build
-        #uses: docker/build-push-action@v2
-        #with:
-         # push: true
-         # tags: "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}"
+      #- name: Build and Push Container
+       # run: |-
+       #   docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/website:${{ github.sha }}" ./
+      #    docker push "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/website:${{ github.sha }}"          
+      - name: Build and push 🐳
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/website:${{ github.sha }}"
       # END - Docker auth and build
 
-      - name: Deploy to Cloud Run
-        id: deploy
-        uses: google-github-actions/deploy-cloudrun@v0
-        with:
-          service: ${{ env.SERVICE }}
-          region: ${{ env.REGION }}
+      # - name: Deploy to Cloud Run
+      #   id: deploy
+      #   uses: google-github-actions/deploy-cloudrun@v0
+      #   with:
+      #     service: ${{ env.SERVICE }}
+      #     region: ${{ env.REGION }}
           # NOTE: If using a pre-built image, update the image name here
-          image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/website:${{ github.sha }}
+          # image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/website:${{ github.sha }}
 
       # If required, use the Cloud Run url output in later steps
-      - name: Show Output
-        run: echo ${{ steps.deploy.outputs.url }}
+      #- name: Show Output
+       # run: echo ${{ steps.deploy.outputs.url }}
