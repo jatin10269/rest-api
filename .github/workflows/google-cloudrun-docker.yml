@@ -54,7 +54,7 @@ env:
   REPO_NAME: jkapprepo # TODO: update Cloud Run service name
   REGION: us-east5 # TODO: update Cloud Run service region
   SERVICE_NAME: website
-
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   deploy:
     # Add 'id-token' with the intended permissions for workload identity federation
