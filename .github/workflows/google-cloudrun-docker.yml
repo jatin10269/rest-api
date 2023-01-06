@@ -98,6 +98,17 @@ jobs:
       - name: Get tag
         id: get-tag
         run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+      - name: tag version
+        id: tag_version
+        uses: rymndhng/release-on-push-action@master
+        with:
+          bump_version_scheme: minor
+          tag_prefix: v      
+
+      - name: verify tags
+        run: |
+          echo "Tag name ${{ steps.tag_version.outputs.tag_name }}"
+          echo "Release version ${{ steps.tag_version.outputs.version }}"
       
       - name: Build and push 🐳
         id: docker_build
