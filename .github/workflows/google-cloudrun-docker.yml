@@ -131,7 +131,7 @@ jobs:
       - name: Deploy to Cloud Run
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v0
-         with:
+        with:
            service: ${{ env.SERVICE_NAME }}
            region: ${{ env.REGION }}
           # NOTE: If using a pre-built image, update the image name here
