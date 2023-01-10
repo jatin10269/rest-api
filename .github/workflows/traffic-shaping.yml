@@ -2,9 +2,13 @@ name: Traffic shaping
 on:
   workflow_dispatch:
     inputs:
+      trafficPercentage:
+        description: 'Percent of traffic to be routed'
+        required: true 
+        type: string
       logLevel:
         description: 'Log level'
-        required: true
+        required: false
         default: 'warning'
         type: choice
         options:
@@ -82,6 +86,6 @@ jobs:
         with:
            service: ${{ env.SERVICE_NAME }}
            region: ${{ env.REGION }}
-           tag_traffic: 'blue=10'
+           tag_traffic: "blue=${{inputs.trafficPercentage}}"
            image: "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ needs.get-tag.outputs.tagVersion }}"
 
