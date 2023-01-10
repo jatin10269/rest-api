@@ -134,6 +134,9 @@ jobs:
         with:
            service: ${{ env.SERVICE_NAME }}
            region: ${{ env.REGION }}
+           no_traffic: true
+           tag_traffic: 'blue'
+           #revision_traffic: 'my-revision=10'
           # NOTE: If using a pre-built image, update the image name here
            image: "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ needs.generate-tag-version.outputs.tagVersion }}"
 
