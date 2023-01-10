@@ -1,0 +1,110 @@
+# This workflow build and push a Docker container to Google Artifact Registry and deploy it on Cloud Run when a commit is pushed to the "master" branch
+#
+# Overview:
+#
+# 1. Authenticate to Google Cloud
+# 2. Authenticate Docker to Artifact Registry 
+# 3. Build a docker container
+# 4. Publish it to Google Artifact Registry
+# 5. Deploy it to Cloud Run
+#
+# To configure this workflow:
+#
+# 1. Ensure the required Google Cloud APIs are enabled:
+#
+#    Cloud Run            run.googleapis.com
+#    Artifact Registry    artifactregistry.googleapis.com
+#
+# 2. Create and configure Workload Identity Federation for GitHub (https://github.com/google-github-actions/auth#setting-up-workload-identity-federation)
+#
+# 3. Ensure the required IAM permissions are granted
+#
+#    Cloud Run
+#      roles/run.admin
+#      roles/iam.serviceAccountUser     (to act as the Cloud Run runtime service account)
+#
+#    Artifact Registry
+#      roles/artifactregistry.admin     (project or repository level)
+#
+#    NOTE: You should always follow the principle of least privilege when assigning IAM roles
+#
+# 4. Create GitHub secrets for WIF_PROVIDER and WIF_SERVICE_ACCOUNT
+#
+# 5. Change the values for the GAR_LOCATION, SERVICE and REGION environment variables (below).
+#
+# NOTE: To use Google Container Registry instead, replace ${{ env.GAR_LOCATION }}-docker.pkg.dev with gcr.io
+#
+# For more support on how to run this workflow, please visit https://github.com/marketplace/actions/deploy-to-cloud-run
+#
+# Further reading:
+#   Cloud Run IAM permissions                 - https://cloud.google.com/run/docs/deploying
+#   Artifact Registry IAM permissions         - https://cloud.google.com/artifact-registry/docs/access-control#roles
+#   Container Registry vs Artifact Registry   - https://cloud.google.com/blog/products/application-development/understanding-artifact-registry-vs-container-registry
+#   Principle of least privilege              - https://cloud.google.com/blog/products/identity-security/dont-get-pwned-practicing-the-principle-of-least-privilege
+
+name: Build and Deploy to Cloud Run
+
+
+env:
+  PROJECT_ID: testproject-373020 # TODO: update Google Cloud project id
+  GAR_LOCATION: us-east5 # TODO: update Artifact Registry location
+  REPO_NAME: jkapprepo # TODO: update Cloud Run service name
+  REGION: us-east5 # TODO: update Cloud Run service region
+  SERVICE_NAME: website
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+jobs:
+  get-tag:
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Required due to the way Git works, without it this action won't be able to find any or the correct tags
+      - name: 'Get Previous tag'
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        with:
+          fallback: 1.0.0 # Optional fallback tag to use when no tag can be found
+      - name: 'Get next minor version'
+        id: semvers
+        uses: "WyriHaximus/github-action-next-semvers@v1"
+        with:
+          version: ${{ steps.previoustag.outputs.tag }}
+      - name: 'Create new milestone'
+        id: createmilestone
+        uses: "WyriHaximus/github-action-create-milestone@v1"
+        with:
+          title: ${{ steps.semvers.outputs.patch }}
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+  outputs: 
+      tagVersion: "${{ steps.previoustag.outputs.tag }}"
+  deploy:
+    # Add 'id-token' with the intended permissions for workload identity federation
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-latest
+    needs: get-tag
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      # actions/checkout MUST come before auth
+      - uses: 'actions/checkout@v3'
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: 'projects/1081210593349/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+          service_account: 'jkaccount@testproject-373020.iam.gserviceaccount.com'
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v0
+        with:
+           service: ${{ env.SERVICE_NAME }}
+           region: ${{ env.REGION }}
+           no_traffic: true
+           revision_traffic: 'blue=10'
+           image: "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ needs.get-tag.outputs.tagVersion }}"
+
