@@ -33,13 +33,13 @@ jobs:
       - name: Build and deploy Container App
         uses: azure/container-apps-deploy-action@v0
         with:
-          appSourcePath: /home/runner/work/rest-api
+          appSourcePath: ${{ github.workspace }}
           #imageToBuild: jkapp.azurecr.io/app:${{ needs.generate-tag-version.outputs.tagVersion }}
           #imageToDeploy: jkapp.azurecr.io/app:${{ needs.generate-tag-version.outputs.tagVersion }}
-          dockerfilePath: Dockerfile
+          #dockerfilePath: Dockerfile
           acrName: jkapp
           acrUsername: ${{ secrets.REGISTRY_USERNAME }}
           acrPassword: ${{ secrets.REGISTRY_PASSWORD }}
           containerAppName: rest-api
           resourceGroup: testResource
-          #containerAppEnvironment: managedEnvironment-testResource-ad69
+          containerAppEnvironment: managedEnvironment-testResource-ad69
