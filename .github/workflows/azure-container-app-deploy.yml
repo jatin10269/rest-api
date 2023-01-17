@@ -3,6 +3,8 @@ name: Build and Deploy to Azure Cloud Run
 on:
   push:
     branches: [ "master" ]
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   generate-tag-version:
     runs-on: ubuntu-latest
