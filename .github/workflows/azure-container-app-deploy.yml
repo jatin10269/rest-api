@@ -29,7 +29,18 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-
+      - name: ACR build
+        id: acr
+        uses: azure/acr-build@v1
+        with:
+          service_principal: ${{ secrets.service_principal }}
+          service_principal_password: ${{ secrets.service_principal_password }}
+          tenant: ${{ secrets.tenant }}
+          registry: ${{ secrets.registry }}
+          repository: ${{ secrets.repository }}
+          image: app
+          git_access_token: ${{ secrets.git_access_token }}
+          tag: ${{ needs.generate-tag-version.outputs.tagVersion }}          
       - name: Build and deploy Container App
         uses: azure/container-apps-deploy-action@v0
         with:
