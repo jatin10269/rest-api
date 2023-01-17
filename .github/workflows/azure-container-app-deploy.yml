@@ -33,9 +33,9 @@ jobs:
       - name: Build and deploy Container App
         uses: azure/container-apps-deploy-action@v0
         with:
-          #appSourcePath: ${{ github.workspace }}
-          imageToBuild: jkapp.azurecr.io/app:${{ needs.generate-tag-version.outputs.tagVersion }}
-          imageToDeploy: jkapp.azurecr.io/app:${{ needs.generate-tag-version.outputs.tagVersion }}
+          appSourcePath: ${{ github.workspace }}
+          #imageToBuild: jkapp.azurecr.io/app:${{ needs.generate-tag-version.outputs.tagVersion }}
+          #imageToDeploy: jkapp.azurecr.io/app:${{ needs.generate-tag-version.outputs.tagVersion }}
           #dockerfilePath: Dockerfile
           acrName: jkapp
           acrUsername: ${{ secrets.REGISTRY_USERNAME }}
