@@ -35,6 +35,7 @@ jobs:
         with:
           #appSourcePath: ${{ github.workspace }}
           imageToBuild: jkapp.azurecr.io/app:${{ needs.generate-tag-version.outputs.tagVersion }}
+          imageToDeploy: jkapp.azurecr.io/app:${{ needs.generate-tag-version.outputs.tagVersion }}
           #dockerfilePath: Dockerfile
           acrName: jkapp
           acrUsername: ${{ secrets.REGISTRY_USERNAME }}
