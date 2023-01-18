@@ -33,4 +33,5 @@ jobs:
       with:
         azcliversion: 2.30.0
         inlineScript: |
+          az config set extension.use_dynamic_install=yes_without_prompt
           az containerapp ingress traffic set -n rest-api -g testResource --revision-weight latest=${{inputs.trafficPercentage}}
