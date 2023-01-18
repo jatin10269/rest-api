@@ -1,4 +1,4 @@
-name: Traffic shaping
+name: Traffic shaping azure
 on:
   workflow_dispatch:
     inputs:
