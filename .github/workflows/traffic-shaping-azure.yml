@@ -1,0 +1,36 @@
+name: Traffic shaping
+on:
+  workflow_dispatch:
+    inputs:
+      trafficPercentage:
+        description: 'Percent of traffic to be routed'
+        required: true 
+        type: string
+      logLevel:
+        description: 'Log level'
+        required: false
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+      tags:
+        description: 'Test scenario tags'
+        required: false
+        type: boolean
+jobs:
+ route-traffic:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Azure CLI script
+      uses: azure/CLI@v1
+      with:
+        azcliversion: 2.30.0
+        inlineScript: |
+          az containerapp ingress traffic set -n rest-api -g testResource --revision-weight latest=${{inputs.trafficPercentage}}
